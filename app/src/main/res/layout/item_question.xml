@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="question"
+            type="com.example.speechtotextandanswerapp.ui.model.Question" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@color/white"
+        android:elevation="5dp">
+
+        <TextView
+            android:id="@+id/question_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{`Q: `+ question.question}"
+            android:layout_margin="10dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:maxWidth="200dp"
+            android:hint="Q: What's Java ?"/>
+
+        <TextView
+            android:id="@+id/answer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{`A: `+ question.answer}"
+            android:layout_margin="10dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintTop_toBottomOf="@id/question_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textStyle="bold"
+            android:hint="A: A programming language.dsdsdsdsdsdsdsdsdsdsdsdsdsddsdsdsdsdsdsdsdsss"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

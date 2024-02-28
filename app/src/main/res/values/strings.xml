@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SpeechToTextAndAnswerApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="chataiapp">ChatAIApp</string>
+    <string name="send">send</string>
+    <string name="click_on_record_button_to_record_voice">Click on record button to record voice</string>
+    <string name="speak_now">Speak now...</string>
+</resources>
