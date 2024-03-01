@@ -4,5 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class QuestionRequest(
     val question: String?,
-    val answer:String?
+    val answer:String?,
+    val audioFileName:String?
 )

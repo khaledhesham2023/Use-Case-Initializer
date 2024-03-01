@@ -8,6 +8,7 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -28,6 +29,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Random
 
 
 @AndroidEntryPoint
@@ -44,6 +48,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private val REQUEST_CODE = 200
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var askedQuestion: String
+    private lateinit var savedFile: File
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -68,6 +73,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         viewBinding.record.setOnClickListener {
             isPlaying = !isPlaying
             if (isPlaying) {
+                setupRecordingFile()
                 viewBinding.clickToRecord.text = getString(R.string.speak_now)
                 viewBinding.record.setImageResource(R.drawable.ic_record)
                 configureMediaRecorder()
@@ -75,9 +81,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 viewBinding.clickToRecord.text = getString(R.string.click_on_record_button_to_record_voice)
                 viewBinding.record.setImageResource(R.drawable.ic_mic)
                 releaseMediaRecorder()
-                val file = File(getRecordingFilePath())
-                val requestFile = RequestBody.create(MultipartBody.FORM, file)
-                val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+                val requestFile = RequestBody.create(MultipartBody.FORM, savedFile)
+                val body = MultipartBody.Part.createFormData("file", savedFile.name, requestFile)
                 viewModel.getSpeechResponse(
                     body,
                     MultipartBody.Part.createFormData("model", "whisper-1")
@@ -98,7 +103,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                     viewModel.saveQuestion(
                         QuestionRequest(
                             askedQuestion,
-                            it.data?.get(0)?.content
+                            it.data?.get(0)?.content,
+                            savedFile.name
                         )
                     )
                     loadingDialog.dismiss()
@@ -182,11 +188,10 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun getRecordingFilePath(): String {
+    private fun setupRecordingFile() {
         val contextWrapper = ContextWrapper(requireContext())
-        val recDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
-        val file = File(recDirectory, "recordedForChatGPT.mp3")
-        return file.path
+        val recDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)
+        savedFile = File(recDirectory, generateFileName())
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -194,7 +199,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         mediaRecorder = MediaRecorder()
         mediaRecorder!!.setAudioSource(MediaRecorder.AudioSource.MIC)
         mediaRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        mediaRecorder!!.setOutputFile(getRecordingFilePath())
+        mediaRecorder!!.setOutputFile(savedFile)
         mediaRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
         mediaRecorder!!.prepare()
         mediaRecorder!!.start()
@@ -204,5 +209,9 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         mediaRecorder!!.stop()
         mediaRecorder!!.release()
         mediaRecorder = null
+    }
+
+    private fun generateFileName():String{
+        return "${Date().time}${Random().nextInt(1000000000)}.mp3"
     }
 }
