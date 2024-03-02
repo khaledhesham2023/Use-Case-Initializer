@@ -32,7 +32,9 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import java.util.Random
 
 
@@ -51,8 +53,9 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var askedQuestion: String
     private lateinit var savedFile: File
-    private lateinit var request:String
-    private lateinit var response:String
+    private lateinit var request: String
+    private lateinit var response: String
+    private lateinit var createdTime: String
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -82,7 +85,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 viewBinding.record.setImageResource(R.drawable.ic_record)
                 configureMediaRecorder()
             } else {
-                viewBinding.clickToRecord.text = getString(R.string.click_on_record_button_to_record_voice)
+                viewBinding.clickToRecord.text =
+                    getString(R.string.click_on_record_button_to_record_voice)
                 viewBinding.record.setImageResource(R.drawable.ic_mic)
                 releaseMediaRecorder()
                 val requestFile = RequestBody.create(MultipartBody.FORM, savedFile)
@@ -112,8 +116,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
+                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    Log.i("LOGG","Get Speech Response: ${it.message}")
                     loadingDialog.dismiss()
                 }
             }
@@ -126,11 +130,13 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
                 is ViewState.Success -> {
                     response = Gson().toJson(it.data).toString()
+                    createdTime = getTime(System.currentTimeMillis())
                     viewModel.saveQuestion(
                         QuestionRequest(
                             askedQuestion,
                             it.data.choices?.get(0)?.message!!.content,
-                            savedFile.name
+                            savedFile.name,
+                            createdTime
                         )
                     )
                     loadingDialog.dismiss()
@@ -138,8 +144,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
+                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    Log.i("LOGG","Get Chat Response: ${it.message}")
                     loadingDialog.dismiss()
                 }
             }
@@ -151,38 +157,37 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Success -> {
-                    viewModel.saveRequestAndResponse(savedFile.name,
-                        SaveRequestAndResponseRequest(request,response)
+                    viewModel.saveRequestAndResponse(
+                        savedFile.name,
+                        SaveRequestAndResponseRequest(request, response)
                     )
                     loadingDialog.dismiss()
                 }
 
                 is ViewState.Error -> {
+                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    Log.i("LOGG","Save Question: ${it.message}")
-
                     loadingDialog.dismiss()
                 }
             }
         })
         viewModel.saveRequestAndResponseLiveData.observe(viewLifecycleOwner, Observer {
-            when(it){
-                    is ViewState.Loading -> {
-                        loadingDialog.show()
-                    }
-
-                    is ViewState.Success -> {
-                        viewModel.getQuestions()
-                        loadingDialog.dismiss()
-                    }
-
-                    is ViewState.Error -> {
-                        Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                        Log.i("LOGG","Save request and response: ${it.message}")
-
-                        loadingDialog.dismiss()
-                    }
+            when (it) {
+                is ViewState.Loading -> {
+                    loadingDialog.show()
                 }
+
+                is ViewState.Success -> {
+                    viewModel.getQuestions()
+                    loadingDialog.dismiss()
+                }
+
+                is ViewState.Error -> {
+                    Log.i("LOGG", it.message)
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    loadingDialog.dismiss()
+                }
+            }
         })
         viewModel.getQuestionsLiveData.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -196,9 +201,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
+                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    Log.i("LOGG","Get Questions Response: ${it.message}")
-
                     loadingDialog.dismiss()
                 }
             }
@@ -244,7 +248,14 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         mediaRecorder = null
     }
 
-    private fun generateFileName():String{
+    private fun generateFileName(): String {
         return "${Date().time}${Random().nextInt(1000000000)}.mp3"
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun getTime(timeInMilliSeconds: Long?): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm")
+        createdTime = formatter.format(Date(timeInMilliSeconds!!))
+        return createdTime
     }
 }
