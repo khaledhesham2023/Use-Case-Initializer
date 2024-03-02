@@ -4,6 +4,7 @@ import com.example.speechtotextandanswerapp.ui.model.Post
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.response.BaseResponse
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
 import com.example.speechtotextandanswerapp.ui.model.response.SpeechResponse
@@ -17,6 +18,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import java.io.File
 
 interface Api {
@@ -36,4 +38,7 @@ interface Api {
 
     @POST("questions/save")
     suspend fun saveQuestion(@Body request: QuestionRequest): BaseResponse
+
+    @POST("saveRequestAndResponse/{audioName}")
+    suspend fun saveRequestAndResponse(@Path("audioName") audioFileName:String,@Body request: SaveRequestAndResponseRequest):BaseResponse
 }

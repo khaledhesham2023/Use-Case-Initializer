@@ -24,7 +24,9 @@ import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -49,6 +51,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var askedQuestion: String
     private lateinit var savedFile: File
+    private lateinit var request:String
+    private lateinit var response:String
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -93,6 +97,27 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun setupObservers() {
+        viewModel.getSpeechResponseLiveData.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ViewState.Loading -> {
+                    loadingDialog.show()
+                }
+
+                is ViewState.Success -> {
+                    askedQuestion = it.data.text!!
+                    gptMessages.add(Message(content = it.data.text))
+                    request = Gson().toJson(ChatRequest(messages = gptMessages)).toString()
+                    viewModel.getChatResponse(ChatRequest(messages = gptMessages))
+                    loadingDialog.dismiss()
+                }
+
+                is ViewState.Error -> {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    Log.i("LOGG","Get Speech Response: ${it.message}")
+                    loadingDialog.dismiss()
+                }
+            }
+        })
         viewModel.getChatResponseLiveData.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ViewState.Loading -> {
@@ -100,10 +125,11 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Success -> {
+                    response = Gson().toJson(it.data).toString()
                     viewModel.saveQuestion(
                         QuestionRequest(
                             askedQuestion,
-                            it.data?.get(0)?.content,
+                            it.data.choices?.get(0)?.message!!.content,
                             savedFile.name
                         )
                     )
@@ -113,9 +139,50 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
                 is ViewState.Error -> {
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    Log.i("LOGG","Get Chat Response: ${it.message}")
                     loadingDialog.dismiss()
                 }
             }
+        })
+        viewModel.saveQuestionLiveData.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ViewState.Loading -> {
+                    loadingDialog.show()
+                }
+
+                is ViewState.Success -> {
+                    viewModel.saveRequestAndResponse(savedFile.name,
+                        SaveRequestAndResponseRequest(request,response)
+                    )
+                    loadingDialog.dismiss()
+                }
+
+                is ViewState.Error -> {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    Log.i("LOGG","Save Question: ${it.message}")
+
+                    loadingDialog.dismiss()
+                }
+            }
+        })
+        viewModel.saveRequestAndResponseLiveData.observe(viewLifecycleOwner, Observer {
+            when(it){
+                    is ViewState.Loading -> {
+                        loadingDialog.show()
+                    }
+
+                    is ViewState.Success -> {
+                        viewModel.getQuestions()
+                        loadingDialog.dismiss()
+                    }
+
+                    is ViewState.Error -> {
+                        Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                        Log.i("LOGG","Save request and response: ${it.message}")
+
+                        loadingDialog.dismiss()
+                    }
+                }
         })
         viewModel.getQuestionsLiveData.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -130,42 +197,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
                 is ViewState.Error -> {
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    loadingDialog.dismiss()
-                }
-            }
-        })
-        viewModel.saveQuestionLiveData.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ViewState.Loading -> {
-                    loadingDialog.show()
-                }
+                    Log.i("LOGG","Get Questions Response: ${it.message}")
 
-                is ViewState.Success -> {
-                    viewModel.getQuestions()
-                    loadingDialog.dismiss()
-                }
-
-                is ViewState.Error -> {
-                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                    loadingDialog.dismiss()
-                }
-            }
-        })
-        viewModel.getSpeechResponseLiveData.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ViewState.Loading -> {
-                    loadingDialog.show()
-                }
-
-                is ViewState.Success -> {
-                    askedQuestion = it.data.text!!
-                    gptMessages.add(Message(content = it.data.text))
-                    viewModel.getChatResponse(ChatRequest(messages = gptMessages))
-                    loadingDialog.dismiss()
-                }
-
-                is ViewState.Error -> {
-                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
             }

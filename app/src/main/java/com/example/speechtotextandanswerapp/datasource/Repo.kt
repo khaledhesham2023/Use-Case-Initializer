@@ -2,6 +2,7 @@ package com.example.speechtotextandanswerapp.datasource
 
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import java.io.File
@@ -18,5 +19,12 @@ class Repo @Inject constructor(private val retrofit: Retrofit) {
 
     suspend fun saveQuestion(request: QuestionRequest) = api.saveQuestion(request)
 
-    suspend fun getSpeechResponse(file: MultipartBody.Part, model: MultipartBody.Part) = api.getSpeechResponse(file, model)
+    suspend fun getSpeechResponse(file: MultipartBody.Part, model: MultipartBody.Part) =
+        api.getSpeechResponse(file, model)
+
+    suspend fun saveRequestAndResponse(
+        audioName: String,
+        requestAndResponseRequest: SaveRequestAndResponseRequest
+    ) = api.saveRequestAndResponse(audioName, requestAndResponseRequest)
+
 }

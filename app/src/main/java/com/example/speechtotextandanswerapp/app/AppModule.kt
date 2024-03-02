@@ -24,7 +24,7 @@ class AppModule : Application() {
         .build()
 
     @Provides
-    fun provideBaseUrl(): String = "http://192.168.1.30:8080/V1/rest/"
+    fun provideBaseUrl(): String = "http://192.168.1.4:8080/V1/rest/"
 
     @Provides
     @Singleton
@@ -35,7 +35,7 @@ class AppModule : Application() {
             if (url.contains("chat/completions") || url.contains("audio/transcriptions")) {
                 val newRequest = request.newBuilder().addHeader(
                     "Authorization",
-                    "Bearer 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"
+                    "Bearer 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"
                 ).build()
                 it.proceed(newRequest)
             } else {

@@ -3,6 +3,7 @@ package com.example.speechtotextandanswerapp.ui.main
 import android.content.Context
 import android.net.http.HttpException
 import android.os.Build
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresExtension
 import androidx.lifecycle.LiveData
@@ -15,6 +16,7 @@ import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.response.BaseResponse
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
 import com.example.speechtotextandanswerapp.ui.model.response.SpeechResponse
@@ -30,8 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(@ApplicationContext private val context: Context,private val useCases: UseCases, private val apiRequestManager: ApiRequestManager) : ViewModel() {
 
-    private var _getChatResponseLiveData = MutableLiveData<ViewState<ArrayList<Message>?>>()
-    val getChatResponseLiveData:LiveData<ViewState<ArrayList<Message>?>>
+    private var _getChatResponseLiveData = MutableLiveData<ViewState<ChatResponse>>()
+    val getChatResponseLiveData:LiveData<ViewState<ChatResponse>>
         get() = _getChatResponseLiveData
 
     private var _getQuestionsLiveData = MutableLiveData<ViewState<ArrayList<Question>>>()
@@ -45,6 +47,10 @@ class MainViewModel @Inject constructor(@ApplicationContext private val context:
     private var _getSpeechResponseLiveData = MutableLiveData<ViewState<SpeechResponse>>()
     val getSpeechResponseLiveData:LiveData<ViewState<SpeechResponse>>
         get() = _getSpeechResponseLiveData
+
+    private var _saveRequestAndResponseLiveData = MutableLiveData<ViewState<BaseResponse>>()
+    val saveRequestAndResponseLiveData : LiveData<ViewState<BaseResponse>>
+        get() = _saveRequestAndResponseLiveData
 
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -69,5 +75,10 @@ class MainViewModel @Inject constructor(@ApplicationContext private val context:
     fun getSpeechResponse(file: MultipartBody.Part, model:MultipartBody.Part) = viewModelScope.launch {
             apiRequestManager.requestApi({useCases.getSpeechResponse(file, model)},_getSpeechResponseLiveData)
 
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun saveRequestAndResponse(audioName:String, request: SaveRequestAndResponseRequest) = viewModelScope.launch {
+        apiRequestManager.requestApi({useCases.saveRequestAndResponse(audioName,request)},_saveRequestAndResponseLiveData)
     }
 }
