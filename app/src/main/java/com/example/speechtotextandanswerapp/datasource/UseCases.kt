@@ -4,6 +4,7 @@ import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
+import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
 import okhttp3.MultipartBody
 import java.io.File
@@ -25,4 +26,7 @@ class UseCases @Inject constructor(private val repo: Repo) {
 
     suspend fun saveRequestAndResponse(audioName: String, request: SaveRequestAndResponseRequest) =
         repo.saveRequestAndResponse(audioName, request)
+
+    suspend fun convertResponseToSpeech(request: TextToSpeechRequest) =
+        repo.convertResponseToSpeech(request)
 }

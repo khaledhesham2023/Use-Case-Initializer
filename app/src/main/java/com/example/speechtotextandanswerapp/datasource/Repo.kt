@@ -3,6 +3,7 @@ package com.example.speechtotextandanswerapp.datasource
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
+import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import java.io.File
@@ -26,5 +27,8 @@ class Repo @Inject constructor(private val retrofit: Retrofit) {
         audioName: String,
         requestAndResponseRequest: SaveRequestAndResponseRequest
     ) = api.saveRequestAndResponse(audioName, requestAndResponseRequest)
+
+    suspend fun convertResponseToSpeech(request: TextToSpeechRequest) =
+        api.convertResponseToSpeech(request)
 
 }

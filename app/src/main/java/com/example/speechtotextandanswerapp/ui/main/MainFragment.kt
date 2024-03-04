@@ -4,7 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContextWrapper
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -25,11 +27,13 @@ import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
+import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -56,6 +60,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private lateinit var request: String
     private lateinit var response: String
     private lateinit var createdTime: String
+    private lateinit var answerText:String
+    private lateinit var responseAudio:MediaPlayer
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -99,6 +105,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun setupObservers() {
         viewModel.getSpeechResponseLiveData.observe(viewLifecycleOwner, Observer {
@@ -116,7 +123,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
-                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
@@ -131,10 +137,11 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 is ViewState.Success -> {
                     response = Gson().toJson(it.data).toString()
                     createdTime = getTime(System.currentTimeMillis())
+                    answerText = it.data.choices?.get(0)?.message!!.content!!
                     viewModel.saveQuestion(
                         QuestionRequest(
                             askedQuestion,
-                            it.data.choices?.get(0)?.message!!.content,
+                            answerText,
                             savedFile.name,
                             createdTime
                         )
@@ -144,7 +151,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
-                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
@@ -165,7 +171,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
-                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
@@ -178,12 +183,11 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Success -> {
-                    viewModel.getQuestions()
+                    viewModel.convertResponseToSpeech(TextToSpeechRequest(input = answerText))
                     loadingDialog.dismiss()
                 }
 
                 is ViewState.Error -> {
-                    Log.i("LOGG", it.message)
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
@@ -201,7 +205,25 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
 
                 is ViewState.Error -> {
-                    Log.i("LOGG", it.message)
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    loadingDialog.dismiss()
+                }
+            }
+        })
+        viewModel.convertResponseToSpeechLiveData.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ViewState.Loading -> {
+                    loadingDialog.show()
+                }
+
+                is ViewState.Success -> {
+                    saveTheFileToTheDevice(it.data)
+                    respondToUser()
+                    viewModel.getQuestions()
+                    loadingDialog.dismiss()
+                }
+
+                is ViewState.Error -> {
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
@@ -257,5 +279,17 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm")
         createdTime = formatter.format(Date(timeInMilliSeconds!!))
         return createdTime
+    }
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun saveTheFileToTheDevice(audioData:ByteArray){
+        val contextWrapper = ContextWrapper(requireContext())
+        val recDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)
+        savedFile = File(recDirectory,generateFileName())
+        savedFile.writeBytes(audioData)
+    }
+
+    private fun respondToUser(){
+        responseAudio = MediaPlayer.create(requireContext(), Uri.fromFile(savedFile))
+        responseAudio.start()
     }
 }

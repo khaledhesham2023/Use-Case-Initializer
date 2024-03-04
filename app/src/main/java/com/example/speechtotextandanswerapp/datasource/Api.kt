@@ -5,10 +5,13 @@ import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
+import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.BaseResponse
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
 import com.example.speechtotextandanswerapp.ui.model.response.SpeechResponse
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -40,5 +43,11 @@ interface Api {
     suspend fun saveQuestion(@Body request: QuestionRequest): BaseResponse
 
     @POST("saveRequestAndResponse/{audioName}")
-    suspend fun saveRequestAndResponse(@Path("audioName") audioFileName:String,@Body request: SaveRequestAndResponseRequest):BaseResponse
+    suspend fun saveRequestAndResponse(
+        @Path("audioName") audioFileName: String,
+        @Body request: SaveRequestAndResponseRequest
+    ): BaseResponse
+
+    @POST("https://api.openai.com/v1/audio/speech")
+    suspend fun convertResponseToSpeech(@Body request: TextToSpeechRequest): ResponseBody
 }

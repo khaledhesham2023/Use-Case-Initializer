@@ -17,6 +17,7 @@ import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
+import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.BaseResponse
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
 import com.example.speechtotextandanswerapp.ui.model.response.SpeechResponse
@@ -26,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import java.io.File
 import javax.inject.Inject
 
@@ -51,6 +53,9 @@ class MainViewModel @Inject constructor(@ApplicationContext private val context:
     private var _saveRequestAndResponseLiveData = MutableLiveData<ViewState<BaseResponse>>()
     val saveRequestAndResponseLiveData : LiveData<ViewState<BaseResponse>>
         get() = _saveRequestAndResponseLiveData
+    private var _convertResponseToSpeechLiveData = MutableLiveData<ViewState<ByteArray>>()
+    val convertResponseToSpeechLiveData : LiveData<ViewState<ByteArray>>
+        get() = _convertResponseToSpeechLiveData
 
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -80,5 +85,9 @@ class MainViewModel @Inject constructor(@ApplicationContext private val context:
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun saveRequestAndResponse(audioName:String, request: SaveRequestAndResponseRequest) = viewModelScope.launch {
         apiRequestManager.requestApi({useCases.saveRequestAndResponse(audioName,request)},_saveRequestAndResponseLiveData)
+    }
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun convertResponseToSpeech(request: TextToSpeechRequest) = viewModelScope.launch {
+        apiRequestManager.requestApi({useCases.convertResponseToSpeech(request).bytes()},_convertResponseToSpeechLiveData)
     }
 }

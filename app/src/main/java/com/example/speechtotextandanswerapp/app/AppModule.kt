@@ -32,10 +32,10 @@ class AppModule : Application() {
         val okHttpClient = OkHttpClient.Builder().addInterceptor(Interceptor {
             val request = it.request()
             val url = request.url().toString()
-            if (url.contains("chat/completions") || url.contains("audio/transcriptions")) {
+            if (url.contains("chat/completions") || url.contains("audio")) {
                 val newRequest = request.newBuilder().addHeader(
                     "Authorization",
-                    "Bearer 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"
+                    "Bearer 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"
                 ).build()
                 it.proceed(newRequest)
             } else {
