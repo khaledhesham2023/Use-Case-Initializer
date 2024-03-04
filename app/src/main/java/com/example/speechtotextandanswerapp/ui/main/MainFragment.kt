@@ -119,7 +119,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                     gptMessages.add(Message(content = it.data.text))
                     request = Gson().toJson(ChatRequest(messages = gptMessages)).toString()
                     viewModel.getChatResponse(ChatRequest(messages = gptMessages))
-                    loadingDialog.dismiss()
                 }
 
                 is ViewState.Error -> {
@@ -146,8 +145,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                             createdTime
                         )
                     )
-                    loadingDialog.dismiss()
-
                 }
 
                 is ViewState.Error -> {
@@ -167,7 +164,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                         savedFile.name,
                         SaveRequestAndResponseRequest(request, response)
                     )
-                    loadingDialog.dismiss()
                 }
 
                 is ViewState.Error -> {
@@ -184,7 +180,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
                 is ViewState.Success -> {
                     viewModel.convertResponseToSpeech(TextToSpeechRequest(input = answerText))
-                    loadingDialog.dismiss()
                 }
 
                 is ViewState.Error -> {
@@ -220,7 +215,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                     saveTheFileToTheDevice(it.data)
                     respondToUser()
                     viewModel.getQuestions()
-                    loadingDialog.dismiss()
                 }
 
                 is ViewState.Error -> {
