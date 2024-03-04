@@ -26,6 +26,7 @@ import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveAudioAnswerRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
@@ -56,7 +57,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private val REQUEST_CODE = 200
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var askedQuestion: String
-    private lateinit var savedFile: File
+    private lateinit var savedQuestionAudioFile: File
+    private lateinit var savedAnswerAudioFile: File
     private lateinit var request: String
     private lateinit var response: String
     private lateinit var createdTime: String
@@ -95,8 +97,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                     getString(R.string.click_on_record_button_to_record_voice)
                 viewBinding.record.setImageResource(R.drawable.ic_mic)
                 releaseMediaRecorder()
-                val requestFile = RequestBody.create(MultipartBody.FORM, savedFile)
-                val body = MultipartBody.Part.createFormData("file", savedFile.name, requestFile)
+                val requestFile = RequestBody.create(MultipartBody.FORM, savedQuestionAudioFile)
+                val body = MultipartBody.Part.createFormData("file", savedQuestionAudioFile.name, requestFile)
                 viewModel.getSpeechResponse(
                     body,
                     MultipartBody.Part.createFormData("model", "whisper-1")
@@ -141,7 +143,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                         QuestionRequest(
                             askedQuestion,
                             answerText,
-                            savedFile.name,
+                            savedQuestionAudioFile.name,
                             createdTime
                         )
                     )
@@ -161,7 +163,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
                 is ViewState.Success -> {
                     viewModel.saveRequestAndResponse(
-                        savedFile.name,
+                        savedQuestionAudioFile.name,
                         SaveRequestAndResponseRequest(request, response)
                     )
                 }
@@ -213,13 +215,25 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
                 is ViewState.Success -> {
                     saveTheFileToTheDevice(it.data)
-                    respondToUser()
-                    viewModel.getQuestions()
+                    viewModel.saveAudioAnswer(SaveAudioAnswerRequest(savedQuestionAudioFile.name,savedAnswerAudioFile.name))
                 }
 
                 is ViewState.Error -> {
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
+                }
+            }
+        })
+        viewModel.saveAudioAnswerLiveData.observe(viewLifecycleOwner, Observer {
+            when(it){
+                is ViewState.Loading -> loadingDialog.show()
+                is ViewState.Success -> {
+                    respondToUser()
+                    viewModel.getQuestions()
+                }
+                is ViewState.Error -> {
+                    loadingDialog.dismiss()
+                    Toast.makeText(requireContext(),it.message,Toast.LENGTH_SHORT).show()
                 }
             }
         })
@@ -244,7 +258,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private fun setupRecordingFile() {
         val contextWrapper = ContextWrapper(requireContext())
         val recDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)
-        savedFile = File(recDirectory, generateFileName())
+        savedQuestionAudioFile = File(recDirectory, generateFileName())
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -252,7 +266,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
         mediaRecorder = MediaRecorder()
         mediaRecorder!!.setAudioSource(MediaRecorder.AudioSource.MIC)
         mediaRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        mediaRecorder!!.setOutputFile(savedFile)
+        mediaRecorder!!.setOutputFile(savedQuestionAudioFile)
         mediaRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
         mediaRecorder!!.prepare()
         mediaRecorder!!.start()
@@ -278,12 +292,12 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private fun saveTheFileToTheDevice(audioData:ByteArray){
         val contextWrapper = ContextWrapper(requireContext())
         val recDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)
-        savedFile = File(recDirectory,generateFileName())
-        savedFile.writeBytes(audioData)
+        savedAnswerAudioFile = File(recDirectory,generateFileName())
+        savedAnswerAudioFile.writeBytes(audioData)
     }
 
     private fun respondToUser(){
-        responseAudio = MediaPlayer.create(requireContext(), Uri.fromFile(savedFile))
+        responseAudio = MediaPlayer.create(requireContext(), Uri.fromFile(savedAnswerAudioFile))
         responseAudio.start()
     }
 }

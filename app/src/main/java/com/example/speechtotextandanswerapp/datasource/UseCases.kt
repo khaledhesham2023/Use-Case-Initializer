@@ -3,6 +3,7 @@ package com.example.speechtotextandanswerapp.datasource
 import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveAudioAnswerRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
@@ -27,6 +28,9 @@ class UseCases @Inject constructor(private val repo: Repo) {
     suspend fun saveRequestAndResponse(audioName: String, request: SaveRequestAndResponseRequest) =
         repo.saveRequestAndResponse(audioName, request)
 
-    suspend fun convertResponseToSpeech(request: TextToSpeechRequest) =
-        repo.convertResponseToSpeech(request)
+    suspend fun convertResponseToSpeech(request: TextToSpeechRequest): ByteArray =
+        repo.convertResponseToSpeech(request).bytes()
+
+    suspend fun saveAudioAnswer(request: SaveAudioAnswerRequest) =
+        repo.saveAudioAnswer(request)
 }

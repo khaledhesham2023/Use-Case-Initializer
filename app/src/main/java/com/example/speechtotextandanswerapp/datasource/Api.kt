@@ -4,6 +4,7 @@ import com.example.speechtotextandanswerapp.ui.model.Post
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveAudioAnswerRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.BaseResponse
@@ -50,4 +51,7 @@ interface Api {
 
     @POST("https://api.openai.com/v1/audio/speech")
     suspend fun convertResponseToSpeech(@Body request: TextToSpeechRequest): ResponseBody
+
+    @POST("saveAudioAnswer")
+    suspend fun saveAudioAnswer(@Body request: SaveAudioAnswerRequest): BaseResponse
 }

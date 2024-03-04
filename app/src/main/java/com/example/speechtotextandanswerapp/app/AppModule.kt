@@ -35,7 +35,7 @@ class AppModule : Application() {
             if (url.contains("chat/completions") || url.contains("audio")) {
                 val newRequest = request.newBuilder().addHeader(
                     "Authorization",
-                    "Bearer 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"
+                    "Bearer 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"
                 ).build()
                 it.proceed(newRequest)
             } else {

@@ -16,6 +16,7 @@ import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
+import com.example.speechtotextandanswerapp.ui.model.request.SaveAudioAnswerRequest
 import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.BaseResponse
@@ -56,6 +57,9 @@ class MainViewModel @Inject constructor(@ApplicationContext private val context:
     private var _convertResponseToSpeechLiveData = MutableLiveData<ViewState<ByteArray>>()
     val convertResponseToSpeechLiveData : LiveData<ViewState<ByteArray>>
         get() = _convertResponseToSpeechLiveData
+    private val _saveAudioAnswerLiveData = MutableLiveData<ViewState<BaseResponse>>()
+    val saveAudioAnswerLiveData:LiveData<ViewState<BaseResponse>>
+        get() = _saveAudioAnswerLiveData
 
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -88,6 +92,11 @@ class MainViewModel @Inject constructor(@ApplicationContext private val context:
     }
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun convertResponseToSpeech(request: TextToSpeechRequest) = viewModelScope.launch {
-        apiRequestManager.requestApi({useCases.convertResponseToSpeech(request).bytes()},_convertResponseToSpeechLiveData)
+        apiRequestManager.requestApi({useCases.convertResponseToSpeech(request)},_convertResponseToSpeechLiveData)
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun saveAudioAnswer(request: SaveAudioAnswerRequest) = viewModelScope.launch {
+        apiRequestManager.requestApi({useCases.saveAudioAnswer(request)},_saveAudioAnswerLiveData)
     }
 }
