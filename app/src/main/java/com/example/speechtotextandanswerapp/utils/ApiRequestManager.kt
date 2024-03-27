@@ -6,6 +6,7 @@ import androidx.annotation.RequiresExtension
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class ApiRequestManager
@@ -16,14 +17,19 @@ constructor(
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     suspend fun <T> requestApi(request: suspend () -> T, liveData: MutableLiveData<ViewState<T>>) {
-        if (isInternetConnected(context)) {
-            try {
-                liveData.value = ViewState.Loading
-                val response = request.invoke()
-                liveData.value = ViewState.Success(response, "Success")
-            } catch (e: HttpException) {
-                liveData.value = ViewState.Error(e.response()!!.errorBody()!!.string())
+        try {
+            if (isInternetConnected(context)) {
+                try {
+                    liveData.value = ViewState.Loading
+                    val response = request.invoke()
+                    liveData.value = ViewState.Success(response, "Success")
+                } catch (e: HttpException) {
+                    liveData.value = ViewState.Error(e.response()!!.errorBody()!!.string())
+                }
             }
+        } catch (e: SocketTimeoutException) {
+            liveData.value = ViewState.Error(e.message!!)
+
         }
     }
 }

@@ -1,13 +1,9 @@
 package com.example.speechtotextandanswerapp.datasource
 
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
-import com.example.speechtotextandanswerapp.ui.model.request.QuestionRequest
-import com.example.speechtotextandanswerapp.ui.model.request.SaveAudioAnswerRequest
-import com.example.speechtotextandanswerapp.ui.model.request.SaveRequestAndResponseRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,19 +15,30 @@ class Repo @Inject constructor(private val retrofit: Retrofit) {
 
     suspend fun getQuestions() = api.getQuestionsHistory()
 
-    suspend fun saveQuestion(request: QuestionRequest) = api.saveQuestion(request)
+//    suspend fun saveQuestion(request: SaveQuestionRequest) = api.saveQuestion(request)
 
-    suspend fun getSpeechResponse(file: MultipartBody.Part, model: MultipartBody.Part) =
-        api.getSpeechResponse(file, model)
+    suspend fun convertSpeechToText(file: MultipartBody.Part, model: MultipartBody.Part) =
+        api.convertSpeechToText(file, model)
 
-    suspend fun saveRequestAndResponse(
-        audioName: String,
-        requestAndResponseRequest: SaveRequestAndResponseRequest
-    ) = api.saveRequestAndResponse(audioName, requestAndResponseRequest)
+    suspend fun convertTextToSpeech(request: TextToSpeechRequest) =
+        api.convertTextToSpeech(request)
 
-    suspend fun convertResponseToSpeech(request: TextToSpeechRequest) =
-        api.convertResponseToSpeech(request)
+//    suspend fun saveAudioFiles(
+//        voiceFiles: List<MultipartBody.Part>,
+//        id: Long
+//    ) = api.saveAudioFiles(voiceFiles, id)
 
-    suspend fun saveAudioAnswer(request: SaveAudioAnswerRequest) = api.saveAudioAnswer(request)
+//    suspend fun insertQuestion(
+//        voiceFiles: List<MultipartBody.Part>,
+//        request: MultipartBody.Part
+//    ) = api.insertQuestion(voiceFiles,request)
 
+    suspend fun saveQuestion(
+        answer: MultipartBody.Part,
+        answerFile: MultipartBody.Part,
+        question: MultipartBody.Part,
+        questionFile:MultipartBody.Part,
+        request:MultipartBody.Part,
+        response:MultipartBody.Part
+    ) = api.saveQuestion(answer, answerFile, question, questionFile, request, response)
 }

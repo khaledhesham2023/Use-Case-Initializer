@@ -6,18 +6,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import com.example.speechtotextandanswerapp.databinding.ItemAnswerBinding
 import com.example.speechtotextandanswerapp.databinding.ItemQuestionBinding
-import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.R
-import com.example.speechtotextandanswerapp.utils.AnswersUtils
 import com.example.speechtotextandanswerapp.utils.QuestionsUtils
 
 class QuestionsAdapter(private var oldData: ArrayList<Question>) : Adapter<QuestionsAdapter.QuestionsViewHolder>() {
-    inner class QuestionsViewHolder(val binding: ItemQuestionBinding): RecyclerView.ViewHolder(binding.root) {
-
-    }
+    inner class QuestionsViewHolder(val binding: ItemQuestionBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionsViewHolder {
         return QuestionsViewHolder(getItemViewBinding(parent,R.layout.item_question))

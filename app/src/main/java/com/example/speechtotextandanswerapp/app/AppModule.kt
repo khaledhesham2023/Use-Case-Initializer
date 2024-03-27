@@ -1,9 +1,12 @@
 package com.example.speechtotextandanswerapp.app
 
 import android.app.Application
+import android.content.Context
+import com.example.speechtotextandanswerapp.utils.OpenAIConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -24,18 +27,18 @@ class AppModule : Application() {
         .build()
 
     @Provides
-    fun provideBaseUrl(): String = "http://192.168.1.4:8080/V1/rest/"
+    fun provideBaseUrl(): String = "http://192.168.1.5:8080/V1/rest/"
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
         val okHttpClient = OkHttpClient.Builder().addInterceptor(Interceptor {
             val request = it.request()
             val url = request.url().toString()
             if (url.contains("chat/completions") || url.contains("audio")) {
                 val newRequest = request.newBuilder().addHeader(
                     "Authorization",
-                    "Bearer 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"
+                    "Bearer ${OpenAIConfig.getApiSecretKey(context)}"
                 ).build()
                 it.proceed(newRequest)
             } else {
