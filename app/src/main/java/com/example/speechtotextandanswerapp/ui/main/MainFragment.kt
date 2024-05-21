@@ -22,10 +22,7 @@ import com.example.speechtotextandanswerapp.base.BaseFragment
 import com.example.speechtotextandanswerapp.databinding.FragmentMainBinding
 import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
-import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
-import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -47,16 +44,11 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private var isPlaying = false
     private val requestCode = 200
     private var mediaRecorder: MediaRecorder? = null
-    private lateinit var askedQuestion: String
     private lateinit var savedQuestionAudioFile: File
     private lateinit var savedAnswerAudioFile: File
-    private lateinit var request: String
-    private lateinit var response: String
-    private lateinit var answerText: String
     private lateinit var responseAudio: MediaPlayer
     private lateinit var voiceFiles: MutableList<File>
     private lateinit var voiceMultipartFiles: MutableList<MultipartBody.Part>
-    private var id: Long = 0
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -93,14 +85,12 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 viewBinding.record.setImageResource(R.drawable.ic_mic)
                 releaseMediaRecorder()
                 val requestFile = RequestBody.create(MultipartBody.FORM, savedQuestionAudioFile)
-                val body = MultipartBody.Part.createFormData(
-                    "file",
-                    savedQuestionAudioFile.name,
-                    requestFile
-                )
-                viewModel.convertSpeechToText(
-                    body,
-                    MultipartBody.Part.createFormData("model", "whisper-1")
+                viewModel.getVoiceAnswer(
+                    MultipartBody.Part.createFormData(
+                        "question_file",
+                        savedQuestionAudioFile.name,
+                        requestFile
+                    )
                 )
             }
         }
@@ -109,70 +99,6 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     @RequiresApi(Build.VERSION_CODES.S)
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun setupObservers() {
-        viewModel.convertSpeechToTextLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is ViewState.Loading -> {
-                    loadingDialog.show()
-                }
-
-                is ViewState.Success -> {
-                    askedQuestion = it.data.text!!
-                    gptMessages.add(Message(content = it.data.text))
-                    request = Gson().toJson(ChatRequest(messages = gptMessages)).toString()
-                    viewModel.getChatResponse(ChatRequest(messages = gptMessages))
-                }
-
-                is ViewState.Error -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error in converting speech to text",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    loadingDialog.dismiss()
-                }
-            }
-        }
-        viewModel.getChatResponseLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is ViewState.Loading -> {
-                    loadingDialog.show()
-                }
-
-                is ViewState.Success -> {
-                    response = Gson().toJson(it.data).toString()
-                    answerText = it.data.choices?.get(0)?.message!!.content!!
-                    viewModel.convertTextToSpeech(TextToSpeechRequest(input = answerText))
-                }
-
-                is ViewState.Error -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error in getting chat response",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    loadingDialog.dismiss()
-                }
-            }
-        }
-
-        viewModel.saveQuestionLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is ViewState.Loading -> {
-                    loadingDialog.show()
-                }
-
-                is ViewState.Success -> {
-                    id = it.data.id
-                    viewModel.getQuestions()
-                }
-
-                is ViewState.Error -> {
-                    Toast.makeText(requireContext(), "Error in saving question", Toast.LENGTH_SHORT)
-                        .show()
-                    loadingDialog.dismiss()
-                }
-            }
-        }
 
         viewModel.getQuestionsLiveData.observe(viewLifecycleOwner) {
             when (it) {
@@ -195,49 +121,18 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 }
             }
         }
-        viewModel.convertTextToSpeechLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is ViewState.Loading -> {
-                    loadingDialog.show()
-                }
-
-                is ViewState.Success -> {
-                    saveTheFileToTheDevice(it.data)
-                    respondToUser()
-                    val question = MultipartBody.Part.createFormData("question", askedQuestion)
-                    val questionAudioFile = MultipartBody.Part.createFormData(
-                        "question_file", savedQuestionAudioFile.name,
-                        RequestBody.create(MultipartBody.FORM, savedQuestionAudioFile)
-                    )
-                    val answer = MultipartBody.Part.createFormData("answer",answerText)
-                    val answerAudioFile = MultipartBody.Part.createFormData("answer_file",savedAnswerAudioFile.name,
-                        RequestBody.create(MultipartBody.FORM,savedAnswerAudioFile))
-                    val requestData = MultipartBody.Part.createFormData("request",request)
-                    val responseData = MultipartBody.Part.createFormData("response",response)
-                    viewModel.saveQuestion(answer,answerAudioFile,question,questionAudioFile,requestData,responseData)
-                }
-
-                is ViewState.Error -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error in converting response to speech",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    loadingDialog.dismiss()
-                }
-            }
-        }
-        viewModel.saveQuestionLiveData.observe(viewLifecycleOwner) {
+        viewModel.getVoiceAnswer.observe(viewLifecycleOwner) {
             when (it) {
                 is ViewState.Loading -> loadingDialog.show()
                 is ViewState.Success -> {
+                    saveTheFileToTheDevice(it.data)
+                    respondToUser()
                     viewModel.getQuestions()
                 }
 
                 is ViewState.Error -> {
                     Toast.makeText(
-                        requireContext(),
-                        "Error during inserting the question",
+                        requireContext(), it.message,
                         Toast.LENGTH_SHORT
                     ).show()
                     loadingDialog.dismiss()

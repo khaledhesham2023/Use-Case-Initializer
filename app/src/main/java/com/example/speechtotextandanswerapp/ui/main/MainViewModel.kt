@@ -27,37 +27,14 @@ class MainViewModel @Inject constructor(
     private val apiRequestManager: ApiRequestManager
 ) : ViewModel() {
 
-    private var _getChatResponseLiveData = MutableLiveData<ViewState<ChatResponse>>()
-    val getChatResponseLiveData: LiveData<ViewState<ChatResponse>>
-        get() = _getChatResponseLiveData
 
     private var _getQuestionsLiveData = MutableLiveData<ViewState<ArrayList<Question>>>()
     val getQuestionsLiveData: MutableLiveData<ViewState<ArrayList<Question>>>
         get() = _getQuestionsLiveData
 
-
-    private var _convertSpeechToTextLiveData = MutableLiveData<ViewState<SpeechResponse>>()
-    val convertSpeechToTextLiveData: LiveData<ViewState<SpeechResponse>>
-        get() = _convertSpeechToTextLiveData
-
-    private var _convertTextToSpeechLiveData = MutableLiveData<ViewState<ByteArray>>()
-    val convertTextToSpeechLiveData: LiveData<ViewState<ByteArray>>
-        get() = _convertTextToSpeechLiveData
-
-    private val _saveQuestionLiveData = MutableLiveData<ViewState<SaveQuestionResponse>>()
-    val saveQuestionLiveData:LiveData<ViewState<SaveQuestionResponse>>
-        get() = _saveQuestionLiveData
-
-
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun getChatResponse(request: ChatRequest) {
-        viewModelScope.launch {
-            apiRequestManager.requestApi(
-                { useCases.getChatResponse(request) },
-                _getChatResponseLiveData
-            )
-        }
-    }
+    private val _getVoiceAnswer = MutableLiveData<ViewState<ByteArray>>()
+    val getVoiceAnswer: LiveData<ViewState<ByteArray>>
+        get() = _getVoiceAnswer
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun getQuestions() = viewModelScope.launch {
@@ -65,30 +42,9 @@ class MainViewModel @Inject constructor(
 
     }
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun convertSpeechToText(file: MultipartBody.Part, model: MultipartBody.Part) =
-        viewModelScope.launch {
-            apiRequestManager.requestApi(
-                { useCases.convertSpeechToText(file, model) },
-                _convertSpeechToTextLiveData
-            )
-        }
-
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun convertTextToSpeech(request: TextToSpeechRequest) = viewModelScope.launch {
-        apiRequestManager.requestApi(
-            { useCases.convertTextToSpeech(request) },
-            _convertTextToSpeechLiveData
-        )
-    }
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun saveQuestion(
-        answer: MultipartBody.Part,
-        answerFile: MultipartBody.Part,
-        question: MultipartBody.Part,
-        questionFile:MultipartBody.Part,
-        request:MultipartBody.Part,
-        response:MultipartBody.Part
+    fun getVoiceAnswer(
+        questionFile: MultipartBody.Part
     ) = viewModelScope.launch {
-        apiRequestManager.requestApi({ useCases.saveQuestion(answer, answerFile, question, questionFile, request, response) },_saveQuestionLiveData)
+        apiRequestManager.requestApi({ useCases.getVoiceAnswer(questionFile) }, _getVoiceAnswer)
     }
 }
