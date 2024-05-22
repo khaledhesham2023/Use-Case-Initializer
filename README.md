@@ -9,10 +9,11 @@ Talk-To-ChatGPT is an application which enables the user to record a voice recor
 ## Step 1: Creating a voice record for the user:
 The user clicks on the record button and once he stops the recording, the voice file is saved on a temp file on the device.
 ## Step 2: OpenAI stage:
-The user's voice file is sent to OpenAI to be transcribed into the suitable text according to the user's language. Then, it sends the text to the user's device. 
-The user's device sends the text once again to OpenAI to process the text and sends the answer as a text to the user's device. Next the user's device sends the text once again to OpenAI to convert answer text to an AI-voiced file to play in the app.
+The user's voice file is sent to a Spring-Boot backend system that in turn connects to OpenAI.
+The voice file is transcribed into the suitable text according to the user's language. Then, the backend system sends the text once again to OpenAI to process the text and sends the suitable answer as a text to the user's device. 
+Next the user's device sends the text once again to OpenAI to convert answer text to an AI-voiced file to play in the app.
 ## Step 3: Saving the question and its answer:
-After sending the answer voice file to the user, The app, connected to a Spring-Boot backend system and MySQL DB Server, saves the question along with other data on the DB as well as uploading the voice files on MinIO Object Storage server and uploading the data into a Kafka Topic.
+Before sending the answer voice file to the user, The Spring-Boot application, logs the outputs of the three OpenAI MySQL Database as well as uploading the voice files into MinIO Bucket Object and the records are then logged into a Kafka Topic.
 ## Step 4: Retrieving the questions and their answers to the app:
 And a list of previously asked questions and their answers are uploaded on a list into the user's screen.
 
@@ -26,3 +27,5 @@ Apache Kafka, MinIO Object Storage.
 https://github.com/khaledhesham2023/Talk-To-ChatGPT-backend
 ### DBMS:
 MySQL Server Framework and SQL Query language.
+### Docker:
+for quick running,testing and deploying the Spring-Boot application as a container using docker desktop.
