@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -22,6 +23,8 @@ import com.example.speechtotextandanswerapp.base.BaseFragment
 import com.example.speechtotextandanswerapp.databinding.FragmentMainBinding
 import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
+import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
+import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
@@ -94,6 +97,14 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 )
             }
         }
+        viewBinding.send.setOnClickListener {
+            if (TextUtils.isEmpty(viewBinding.questionEditText.text.toString())) {
+                Toast.makeText(requireContext(), "Please enter a question", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                viewModel.getVoiceAnswerFromText(QuestionTextToVoiceRequest(viewBinding.questionEditText.text.toString()))
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -135,6 +146,20 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                         requireContext(), it.message,
                         Toast.LENGTH_SHORT
                     ).show()
+                    loadingDialog.dismiss()
+                }
+            }
+        }
+        viewModel.getVoiceAnswerFromText.observe(viewLifecycleOwner){
+            when(it){
+                is ViewState.Loading -> loadingDialog.show()
+                is ViewState.Success -> {
+                    saveTheFileToTheDevice(it.data)
+                    respondToUser()
+                    viewModel.getQuestions()
+                }
+                is ViewState.Error -> {
+                    Toast.makeText(requireContext(),it.message,Toast.LENGTH_SHORT).show()
                     loadingDialog.dismiss()
                 }
             }

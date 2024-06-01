@@ -51,6 +51,41 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/click_to_record" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/or"
+            android:text="@string/or"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/record"
+            android:layout_margin="10dp"
+            android:textColor="@color/black"
+            android:textStyle="normal"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:id="@+id/question_editText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/or"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="20dp"
+            android:hint="@string/enter_your_question_here"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/click_send_to_send_your_written_question"
+            android:textAllCaps="true"
+            app:layout_constraintTop_toBottomOf="@id/question_editText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="20dp"/>
+
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -61,7 +96,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/record" />
+            app:layout_constraintTop_toBottomOf="@id/send" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

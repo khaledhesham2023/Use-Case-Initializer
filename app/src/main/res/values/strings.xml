@@ -6,4 +6,7 @@
     <string name="send">send</string>
     <string name="click_on_record_button_to_record_voice">Click on record button to record voice</string>
     <string name="speak_now">Speak now...</string>
+    <string name="or">Or</string>
+    <string name="enter_your_question_here">Enter your question here</string>
+    <string name="click_send_to_send_your_written_question">Click \'Here\' to send your written question</string>
 </resources>

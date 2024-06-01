@@ -8,9 +8,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -35,20 +37,21 @@ class AppModule : Application() {
 //    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
 //        val okHttpClient = OkHttpClient.Builder().addInterceptor(Interceptor {
 //            val request = it.request()
-//            val url = request.url().toString()
-//            if (url.contains("chat/completions") || url.contains("audio")) {
-//                val newRequest = request.newBuilder().addHeader(
-//                    "Authorization",
-//                    "Bearer ${OpenAIConfig.getApiSecretKey(context)}"
-//                ).build()
-//                it.proceed(newRequest)
-//            } else {
-//                it.proceed(request)
-//            }
+////            val url = request.url().toString()
+//            it.proceed(request)
+////            if (url.contains("chat/completions") || url.contains("audio")) {
+////                val newRequest = request.newBuilder().addHeader(
+////                    "Authorization",
+////                    "Bearer ${OpenAIConfig.getApiSecretKey(context)}"
+////                ).build()
+////                it.proceed(newRequest)
+////            } else {
+////                it.proceed(request)
+////            }
 //        })
-//            .connectTimeout(30L,TimeUnit.SECONDS)
-//            .readTimeout(30L, TimeUnit.SECONDS)
-//            .writeTimeout(30L,TimeUnit.SECONDS)
+//            .connectTimeout(60L, TimeUnit.SECONDS)
+//            .readTimeout(60L, TimeUnit.SECONDS)
+//            .writeTimeout(60L,TimeUnit.SECONDS)
 //            .build()
 //        return okHttpClient
 //    }

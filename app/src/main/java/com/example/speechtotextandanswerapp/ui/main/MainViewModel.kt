@@ -8,7 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speechtotextandanswerapp.datasource.UseCases
 import com.example.speechtotextandanswerapp.ui.model.Question
+import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
+import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
 import com.example.speechtotextandanswerapp.ui.model.response.SaveQuestionResponse
@@ -36,6 +38,10 @@ class MainViewModel @Inject constructor(
     val getVoiceAnswer: LiveData<ViewState<ByteArray>>
         get() = _getVoiceAnswer
 
+    private val _getVoiceAnswerFromText = MutableLiveData<ViewState<ByteArray>>()
+    val getVoiceAnswerFromText:LiveData<ViewState<ByteArray>>
+        get() = _getVoiceAnswerFromText
+
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun getQuestions() = viewModelScope.launch {
         apiRequestManager.requestApi({ useCases.getQuestions() }, _getQuestionsLiveData)
@@ -46,5 +52,12 @@ class MainViewModel @Inject constructor(
         questionFile: MultipartBody.Part
     ) = viewModelScope.launch {
         apiRequestManager.requestApi({ useCases.getVoiceAnswer(questionFile) }, _getVoiceAnswer)
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun getVoiceAnswerFromText(
+        request:QuestionTextToVoiceRequest
+    ) = viewModelScope.launch {
+        apiRequestManager.requestApi({useCases.getVoiceAnswerFromText(request)}, _getVoiceAnswerFromText)
     }
 }

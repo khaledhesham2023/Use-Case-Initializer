@@ -1,6 +1,8 @@
 package com.example.speechtotextandanswerapp.datasource
 
+import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
 import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
+import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
 import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
@@ -14,4 +16,7 @@ class Repo @Inject constructor(private val retrofit: Retrofit) {
     suspend fun getVoiceAnswer(
         questionFile:MultipartBody.Part
     ) = api.getVoiceAnswer(questionFile)
+    suspend fun getVoiceAnswerFromText(
+        request:QuestionTextToVoiceRequest
+    ) = api.getVoiceAnswerFromText(request)
 }
