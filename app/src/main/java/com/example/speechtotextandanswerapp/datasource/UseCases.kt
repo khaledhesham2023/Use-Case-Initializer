@@ -22,4 +22,8 @@ class UseCases @Inject constructor(private val repo: Repo) {
     suspend fun getVoiceAnswerFromText(
         request:QuestionTextToVoiceRequest
     ):ByteArray = repo.getVoiceAnswerFromText(request).bytes()
+
+    suspend fun getAnswerTextFromQuestionText(
+        request: QuestionTextToVoiceRequest
+    ) = repo.getAnswerTextFromQuestionText(request)
 }

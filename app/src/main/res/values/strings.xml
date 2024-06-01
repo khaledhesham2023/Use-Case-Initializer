@@ -9,4 +9,5 @@
     <string name="or">Or</string>
     <string name="enter_your_question_here">Enter your question here</string>
     <string name="click_send_to_send_your_written_question">Click \'Here\' to send your written question</string>
+    <string name="include_voice_in_the_answer">Include voice in the answer</string>
 </resources>

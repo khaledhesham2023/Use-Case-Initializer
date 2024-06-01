@@ -19,4 +19,7 @@ class Repo @Inject constructor(private val retrofit: Retrofit) {
     suspend fun getVoiceAnswerFromText(
         request:QuestionTextToVoiceRequest
     ) = api.getVoiceAnswerFromText(request)
+    suspend fun getAnswerTextFromQuestionText(
+        request: QuestionTextToVoiceRequest
+    ) = api.getAnswerTextFromQuestionText(request)
 }

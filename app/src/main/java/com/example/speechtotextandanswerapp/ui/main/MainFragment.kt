@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
@@ -26,6 +27,7 @@ import com.example.speechtotextandanswerapp.ui.model.Question
 import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
+import com.google.android.material.button.MaterialButton.OnCheckedChangeListener
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -52,6 +54,7 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private lateinit var responseAudio: MediaPlayer
     private lateinit var voiceFiles: MutableList<File>
     private lateinit var voiceMultipartFiles: MutableList<MultipartBody.Part>
+    private var isChecked = false
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -97,12 +100,18 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 )
             }
         }
+
         viewBinding.send.setOnClickListener {
             if (TextUtils.isEmpty(viewBinding.questionEditText.text.toString())) {
                 Toast.makeText(requireContext(), "Please enter a question", Toast.LENGTH_SHORT)
                     .show()
             } else {
-                viewModel.getVoiceAnswerFromText(QuestionTextToVoiceRequest(viewBinding.questionEditText.text.toString()))
+                if (viewBinding.includeVoiceCheckBox.isChecked){
+                    viewModel.getVoiceAnswerFromText(QuestionTextToVoiceRequest(viewBinding.questionEditText.text.toString()))
+                } else {
+                    viewModel.getAnswerTextFromQuestionText(QuestionTextToVoiceRequest(viewBinding.questionEditText.text.toString()))
+                }
+
             }
         }
     }
@@ -156,6 +165,18 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
                 is ViewState.Success -> {
                     saveTheFileToTheDevice(it.data)
                     respondToUser()
+                    viewModel.getQuestions()
+                }
+                is ViewState.Error -> {
+                    Toast.makeText(requireContext(),it.message,Toast.LENGTH_SHORT).show()
+                    loadingDialog.dismiss()
+                }
+            }
+        }
+        viewModel.getAnswerTextFromQuestionTextLiveData.observe(viewLifecycleOwner){
+            when(it){
+                is ViewState.Loading -> loadingDialog.show()
+                is ViewState.Success -> {
                     viewModel.getQuestions()
                 }
                 is ViewState.Error -> {

@@ -26,4 +26,7 @@ interface Api {
 
     @POST("question-to-voice")
     suspend fun getVoiceAnswerFromText(@Body request: QuestionTextToVoiceRequest): ResponseBody
+
+    @POST("question-to-answer")
+    suspend fun getAnswerTextFromQuestionText(@Body request: QuestionTextToVoiceRequest): Question
 }
