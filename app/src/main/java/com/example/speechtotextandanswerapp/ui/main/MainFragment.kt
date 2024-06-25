@@ -11,11 +11,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.CompoundButton
+import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,10 +26,8 @@ import com.example.speechtotextandanswerapp.base.BaseFragment
 import com.example.speechtotextandanswerapp.databinding.FragmentMainBinding
 import com.example.speechtotextandanswerapp.ui.model.Message
 import com.example.speechtotextandanswerapp.ui.model.Question
-import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
 import com.example.speechtotextandanswerapp.utils.ViewState
-import com.google.android.material.button.MaterialButton.OnCheckedChangeListener
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -54,7 +54,8 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private lateinit var responseAudio: MediaPlayer
     private lateinit var voiceFiles: MutableList<File>
     private lateinit var voiceMultipartFiles: MutableList<MultipartBody.Part>
-    private var isChecked = false
+
+
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -114,6 +115,10 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
 
             }
         }
+
+//        viewBinding.urlButton.setOnClickListener {
+////            createDialogToEnterBaseUrl()
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -254,5 +259,28 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
     private fun respondToUser() {
         responseAudio = MediaPlayer.create(requireContext(), Uri.fromFile(savedAnswerAudioFile))
         responseAudio.start()
+    }
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    private fun createDialogToEnterBaseUrl() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_baseurl,null)
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        val editText = dialogView.findViewById<EditText>(R.id.baseurl_edittext)
+//        editText.setText(sharedPreferencesManager.getBaseUrl() ?: "")
+        alertDialogBuilder.setTitle("Info")
+        alertDialogBuilder.setView(dialogView)
+        alertDialogBuilder.setPositiveButton("Confirm"
+        ) { _, _ ->
+            if(!TextUtils.isEmpty(editText.text.toString())){
+//                sharedPreferencesManager.setBaseUrl("http://${editText.text}:8080/V1/rest/")
+                viewModel.getQuestions()
+//                Toast.makeText(requireContext(),sharedPreferencesManager.getBaseUrl(),Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(),"Please enter a baseUrl",Toast.LENGTH_SHORT).show()
+            }
+        }
+        alertDialogBuilder.setNegativeButton("Cancel"
+        ) { dialog, _ -> dialog!!.cancel() }
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
     }
 }

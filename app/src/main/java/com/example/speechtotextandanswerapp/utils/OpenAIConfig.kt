@@ -2,6 +2,7 @@ package com.example.speechtotextandanswerapp.utils
 
 import android.content.Context
 import com.example.speechtotextandanswerapp.R
+//import com.example.speechtotextandanswerapp.R
 import java.io.IOException
 import java.util.Properties
 

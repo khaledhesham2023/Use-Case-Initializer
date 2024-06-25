@@ -1,13 +1,7 @@
 package com.example.speechtotextandanswerapp.datasource
 
 import com.example.speechtotextandanswerapp.ui.model.Question
-import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
-import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
-import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
-import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
-import com.example.speechtotextandanswerapp.ui.model.response.SaveQuestionResponse
-import com.example.speechtotextandanswerapp.ui.model.response.SpeechResponse
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.http.Body

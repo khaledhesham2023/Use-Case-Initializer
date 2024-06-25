@@ -8,13 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speechtotextandanswerapp.datasource.UseCases
 import com.example.speechtotextandanswerapp.ui.model.Question
-import com.example.speechtotextandanswerapp.ui.model.QuestionToAnswerEntity
-import com.example.speechtotextandanswerapp.ui.model.request.ChatRequest
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
-import com.example.speechtotextandanswerapp.ui.model.request.TextToSpeechRequest
-import com.example.speechtotextandanswerapp.ui.model.response.ChatResponse
-import com.example.speechtotextandanswerapp.ui.model.response.SaveQuestionResponse
-import com.example.speechtotextandanswerapp.ui.model.response.SpeechResponse
 import com.example.speechtotextandanswerapp.utils.ApiRequestManager
 import com.example.speechtotextandanswerapp.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
