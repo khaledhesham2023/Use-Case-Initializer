@@ -1,5 +1,6 @@
 package com.example.speechtotextandanswerapp.ui.main
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.lifecycle.LiveData
@@ -12,6 +13,7 @@ import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoice
 import com.example.speechtotextandanswerapp.utils.ApiRequestManager
 import com.example.speechtotextandanswerapp.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -19,10 +21,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val useCases: UseCases,
+    @ApplicationContext context: Context,
     private val apiRequestManager: ApiRequestManager
 ) : ViewModel() {
 
+    private val useCases: UseCases = UseCases(context)
 
     private var _getQuestionsLiveData = MutableLiveData<ViewState<ArrayList<Question>>>()
     val getQuestionsLiveData: MutableLiveData<ViewState<ArrayList<Question>>>

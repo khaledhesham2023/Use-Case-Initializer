@@ -13,20 +13,20 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-class AppModule : Application() {
+//@Module
+//@InstallIn(SingletonComponent::class)
+//class AppModule : Application() {
 
-    @Provides
-    @Singleton
-    fun provideRetrofit(baseUrl:String): Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-
-    @Provides
-    fun provideBaseUrl(@ApplicationContext context: Context): String = OpenAIConfig.getBaseUrl(context)!!
+//    @Provides
+//    @Singleton
+//    fun provideRetrofit(baseUrl:String): Retrofit = Retrofit.Builder()
+//        .baseUrl(baseUrl)
+//        .addConverterFactory(GsonConverterFactory.create())
+//        .build()
+//
+//
+//    @Provides
+//    fun provideBaseUrl(@ApplicationContext context: Context): String = OpenAIConfig.getBaseUrl(context)!!
 
 
     /**
@@ -55,4 +55,4 @@ class AppModule : Application() {
 //            .build()
 //        return okHttpClient
 //    }
-}
+//}

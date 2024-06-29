@@ -1,12 +1,14 @@
 package com.example.speechtotextandanswerapp.datasource
 
+import android.content.Context
 import com.example.speechtotextandanswerapp.ui.model.request.QuestionTextToVoiceRequest
 import okhttp3.MultipartBody.Part
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class UseCases @Inject constructor(private val repo: Repo) {
+class UseCases(context: Context) {
+
+    private val repo = Repo(context)
 
     suspend fun getQuestions() = repo.getQuestions()
 

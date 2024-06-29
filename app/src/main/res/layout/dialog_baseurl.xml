@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Enter your Base URL"
+        android:text="@string/enter_your_address_and_port"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,11 +19,12 @@
         android:id="@+id/baseurl_edittext"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:inputType="textUri"
+        android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

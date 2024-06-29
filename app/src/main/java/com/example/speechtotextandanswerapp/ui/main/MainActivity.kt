@@ -1,5 +1,6 @@
 package com.example.speechtotextandanswerapp.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -56,11 +57,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         alertDialogBuilder.setPositiveButton("Confirm"
         ) { _, _ ->
             if(!TextUtils.isEmpty(editText.text.toString())){
-//                sharedPreferencesManager.setBaseUrl("http://${editText.text}:8080/V1/rest/")
+                sharedPreferencesManager.setBaseUrl("http://${editText.text}/V1/rest/")
+                startActivity(Intent(this,MainActivity::class.java))
+                finish()
 //                viewModel.getQuestions()
 //                Toast.makeText(requireContext(),sharedPreferencesManager.getBaseUrl(),Toast.LENGTH_SHORT).show()
             } else {
-//                Toast.makeText(requireContext(),"Please enter a baseUrl", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,"Enter a valid BaseURL", Toast.LENGTH_SHORT).show()
             }
         }
         alertDialogBuilder.setNegativeButton("Cancel"

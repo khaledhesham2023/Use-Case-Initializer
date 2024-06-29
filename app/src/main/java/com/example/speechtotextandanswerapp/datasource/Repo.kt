@@ -9,13 +9,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class Repo @Inject constructor(private val retrofit: Retrofit) {
-//    private val sharedPreferencesManager = SharedPreferencesManager(context)
-//    private val retrofit = Retrofit.Builder()
-//        .baseUrl(sharedPreferencesManager.getBaseUrl()!!)
-//        .addConverterFactory(GsonConverterFactory.create())
-//        .build()
+class Repo(context: Context) {
+    private val sharedPreferencesManager = SharedPreferencesManager(context)
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(sharedPreferencesManager.getBaseUrl() ?: "")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
     private val api: Api = retrofit.create(Api::class.java)
     suspend fun getQuestions() = api.getQuestionsHistory()
     suspend fun getVoiceAnswer(

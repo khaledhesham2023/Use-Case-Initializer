@@ -6,6 +6,7 @@ import androidx.annotation.RequiresExtension
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
@@ -26,10 +27,15 @@ constructor(
                 } catch (e: HttpException) {
                     liveData.value = ViewState.Error(e.response()!!.errorBody()!!.string())
                 }
+            } else {
+                liveData.value = ViewState.Error("No Internet Connection")
             }
         } catch (e: SocketTimeoutException) {
             liveData.value = ViewState.Error(e.message!!)
-
+        } catch (e: ConnectException) {
+            liveData.value = ViewState.Error(e.message!!)
+        } catch (e:Exception) {
+            liveData.value = ViewState.Error(e.message!!)
         }
     }
 }
