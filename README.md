@@ -1,4 +1,4 @@
-# Talk-To-ChatGPT
+# Use-Case Initalizer
 Talk-To-ChatGPT is an application which enables the user to record a voice record and sends it to OpenAI in order to send the proper answer in the form of AI-voiced record.
 
 ![WhatsApp Image 2024-03-17 at 2 52 37 PM](https://github.com/khaledhesham2023/Talk-to-ChatGPT/assets/95777100/97db21db-476e-4e6f-80ad-dad77533189a)
@@ -24,7 +24,7 @@ Retrofit for network connections, Kotlin Coroutines for multithreading purposes,
 ### Backend System:
 Spring-Boot Framework, Intellij IDEA IDE, Java programming language.
 Apache Kafka, MinIO Object Storage.
-https://github.com/khaledhesham2023/Talk-To-ChatGPT-backend
+[https://github.com/khaledhesham2023/Use-Case-Initializer-backend]
 ### DBMS:
 MySQL Server Framework and SQL Query language.
 ### Docker:
